@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>04 Word Frequency and Keywords</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lars Hinrichs Digital Text Analysis" />
+    <script src="index_files/header-attrs/header-attrs.js"></script>
+    <link href="index_files/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="index_files/tile-view/tile-view.js"></script>
+    <link href="index_files/animate.css/animate.xaringan.css" rel="stylesheet" />
+    <link href="index_files/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="index_files/panelset/panelset.css" rel="stylesheet" />
+    <script src="index_files/panelset/panelset.js"></script>
+    <script src="index_files/fabric/fabric.min.js"></script>
+    <link href="index_files/xaringanExtra-scribble/scribble.css" rel="stylesheet" />
+    <script src="index_files/xaringanExtra-scribble/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# 04 Word Frequency and Keywords
+### Lars Hinrichs<br />Digital Text Analysis
+
+---
+
+class: center, middle
+
+
+
+
+
+
+
+
+## Outline
+
+Word frequencies&lt;br /&gt;
+Stopwords&lt;br /&gt;
+Word clouds&lt;br /&gt;
+Keywords
+
+---
+class: inverse, center, middle
+
+# Word frequencies
+
+---
+class: middle
+
+## Word frequencies
+
+Basic assumption: more frequent words are more important and representative of a corpus's style/content/cognitive style
+---
+class:middle
+
+## Get the top-20 most frequent words in your corpus
+
+
+
+First, tokenize your corpus using unnest_tokens() from {tidytext}.
+
+
+```r
+corpus_tokens &lt;- 
+  corpus %&gt;% 
+  unnest_tokens(word, text)
+```
+
+---
+
+
+
+## Count word forms
+
+Now, use count() to get the frequencies of unique word forms.
+
+.panelset[
+.panel[.panel-name[Code]
+
+
+```r
+top20 &lt;- 
+  corpus_tokens %&gt;% 
+  count(word, sort = T) %&gt;% 
+  slice_max(n, n=20)
+
+top20 
+```
+
+]
+
+.panel[.panel-name[Output]
+&lt;img src="top20.png" width="30%" /&gt;
+]
+]
+
+---
+class: middle
+
+## Observation
+
+Practically all words in the top-20 are function words (i.e. grammatical words), with two exceptions: *said* and *have*.
+--
+
+This analysis is nearly useless - any other corpus of English would look pretty much identical!
+
+---
+class: middle
+
+This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called `stop_words`.
+
+
+```
+## # A tibble: 1,149 × 2
+##    word        lexicon
+##    &lt;chr&gt;       &lt;chr&gt;  
+##  1 a           SMART  
+##  2 a's         SMART  
+##  3 able        SMART  
+##  4 about       SMART  
+##  5 above       SMART  
+##  6 according   SMART  
+##  7 accordingly SMART  
+##  8 across      SMART  
+##  9 actually    SMART  
+## 10 after       SMART  
+## # … with 1,139 more rows
+```
+
+---
+
+### Removing stop words from a corpus
+
+Because stop_words has a column with the same name as one of the columns in our corpus--the column **words**--we can easily remove all stop words using anti_join().
+
+
+```r
+corpus_tokens &lt;- 
+  corpus_tokens %&gt;% 
+  anti_join(stop_words)
+```
+
+We've just lost a little more than half of our corpus size, but that's okay. Let's run the top-20 analysis again.
+
+---
+
+## Top-20 after stopword removal
+
+.panelset[
+.panel[.panel-name[Code]
+
+
+```r
+top20 &lt;- 
+  corpus_tokens %&gt;% 
+  count(word, sort = T) %&gt;% 
+  slice_max(n, n=20)
+
+top20 
+```
+
+]
+
+.panel[.panel-name[Output]
+&lt;img src="top20_2_result.png" width="30%" /&gt;
+]
+]
+
+---
+
+## Much better!
+
+.pull-left[
+This gives us a much better idea of what's going on in our corpus--at least what some of the dominant topics are.
+
+But still not perfect. What else would we want to exclude? 
+]
+
+.pull-right[
+&lt;img src="top20_2_result.png" width="90%" /&gt;
+
+]
+
+
+---
+class: middle, center
+
+
+&lt;img src="top20_2_result.png" width="60%" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
