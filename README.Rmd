@@ -1,0 +1,11 @@
+---
+title: "04 Word frequencies and keywords"
+author: "Lars Hinrichs<br />Digital Text Analysis"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Find the slide presentation [here](index.html).
