@@ -147,7 +147,7 @@ stop_words
 
 ### Removing stop words from a corpus
 
-Because stop_words has a column with the same name as one of the columns in our corpus--the column **words**--we can easily remove all stop words using anti_join().
+Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join().
 
 ```{r}
 corpus_tokens <- 
@@ -182,10 +182,10 @@ top20
 
 ---
 
-## Much better!
+## Observation
 
 .pull-left[
-This gives us a much better idea of what's going on in our corpus--at least what some of the dominant topics are.
+Much better! This gives us an idea of what's going on in our corpus - at least of what some of the dominant topics are.
 
 But still not perfect. What else would we want to exclude? 
 ]
