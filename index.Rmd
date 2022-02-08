@@ -120,7 +120,6 @@ top20
 ]
 
 ---
-class:middle
 
 ## Observation
 
@@ -128,13 +127,13 @@ Practically all words in the top-20 are function words (i.e. grammatical words),
 
 --
 
-This analysis is nearly useless: any other corpus of English would look pretty much identical!
+But that finding is nearly useless: any other corpus of English would look pretty much identical!
 
 ---
 class: middle
 
 .pull-left[
-This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called `stop_words`.]
+This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called stop_words.]
 
 .pull-right[
 
@@ -147,7 +146,9 @@ stop_words
 
 ### Removing stop words from a corpus
 
-Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join().
+Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join(). 
+
+> Please read up on the *join* group of commands -  anti_join(), left_join(), etc. -  [here](https://dplyr.tidyverse.org/reference/mutate-joins.html) and [here](https://dplyr.tidyverse.org/reference/filter-joins.html).
 
 ```{r}
 corpus_tokens <- 
@@ -155,7 +156,12 @@ corpus_tokens <-
   anti_join(stop_words)
 ```
 
-We've just lost a little more than half of our corpus size, but that's okay. Let's run the top-20 analysis again.
+---
+class:middle
+
+By dropping the stop words in our corpus, we've just lost a little more than half of our corpus size, but that's okay. At least we now know that the remaining words are actually interesting! 
+
+Let's run the top-20 analysis again.
 
 ---
 
@@ -187,7 +193,7 @@ top20
 .pull-left[
 Much better! This gives us an idea of what's going on in our corpus - at least of what some of the dominant topics are.
 
-But still not perfect. What else would we want to exclude? 
+But still not perfect. What else remains in the list that is not helpful? 
 ]
 
 .pull-right[
@@ -205,4 +211,108 @@ xaringanExtra::use_scribble()
 <img src="top20_2_result.png" width="60%" />
 
 ---
+
+## Plan of action
+
+We should
+
+- write our own custom list of words to exclude in addition to the stop words (e.g. *it's*, which should have been dropped via stop word removal, but wasn't),
+- find a way to handle different inflected forms of the same word (e.g. *time/times*),
+- think about whether we want to conflate pairs of synonyms (e.g. *doctor* and *doc*).
+
+---
+
+## Write a custom "blacklist" of words 
+
+We'll write a simple vector of words we want to exclude. Since a vector is not a tibble (or data frame), we can't use anti_join() to remove those words from the corpus_tokens object. But we can use filter() to achieve the same thing.
+
+```{r}
+my_excl <- 
+  c("it’s", "time")
+
+corpus_tokens <- 
+  corpus_tokens %>% 
+  filter(!word %in% my_excl)
+```
+
+---
+
+## Dealing with typographic punctuation
+
+The reason why we still had "it's" in the corpus (even after stop word removal) is because there were typographic apostrophes in there. And the stop_words list only knows straight apostrophes. 
+
+Let us replace one with the other, i.e. all typographic apostrophes will be replaced by straight ones: out with ’ and in with '. **We'll use another str_...() function for this.**
+
+```{r}
+corpus_tokens <- 
+  corpus_tokens %>% 
+  mutate(word = str_replace_all(word, "’", "'"))
+```
+
+---
+
+## Different forms of the same word
+
+*time/times*
+
+stemming vs. lemmatizing
+
+Either one of the procedures above would help here, but lemmatization is clearly better. We will discuss it in an upcoming class session when we talk about *annotation*.
+
+---
+class:middle
+
+## Synonyms
+
+If it is important to the analysis, then we may sometimes want to map several synonyms onto one term. Simply for practice, let's say we want to consolidate variation among different terms for the current pandemic: in our corpus we encounter *coronavirus, covid*, and *pandemic*, but we want them all to be replaced by one term - let's say *covid-19.*
+
+---
+class:middle
+
+Using the str_replace_all() function, here is how to search for several options and replace with just one string.
+
+```{r}
+corpus_tokens <- 
+  corpus_tokens %>% 
+  mutate(word = 
+           str_replace_all(word,
+                           "pandemic|covid|coronavirus",
+                           "covid-19"))
+```
+
+---
+class: middle
+
+When we finally re-run the top-20 analysis, here is what we get.
+
+---
+
+.pull-left[
+```{r echo=F}
+pacman::p_load(kableExtra)
+corpus_tokens %>%
+  count(word, sort = T) %>% 
+  mutate(rank = row_number()) %>% 
+  select(rank, everything()) %>% 
+  slice(1:10) %>% 
+  kbl() %>% kable_paper()
+```
+
+]
+
+.pull-right[
+
+```{r echo=F}
+corpus_tokens %>% 
+  mutate(rank = row_number()) %>% 
+  select(rank, everything()) %>% 
+  count(word, sort = T) %>% 
+  mutate(rank = row_number()) %>% 
+  select(rank, everything()) %>% 
+  slice(11:20) %>% 
+  kbl() %>% kable_paper()
+```
+]
+
+
 

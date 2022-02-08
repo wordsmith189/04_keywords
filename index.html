@@ -15,6 +15,8 @@
     <link href="index_files/xaringanExtra-scribble/scribble.css" rel="stylesheet" />
     <script src="index_files/xaringanExtra-scribble/scribble.js"></script>
     <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="index_files/kePrint/kePrint.js"></script>
+    <link href="index_files/lightable/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -100,7 +102,6 @@ top20
 ]
 
 ---
-class:middle
 
 ## Observation
 
@@ -108,13 +109,13 @@ Practically all words in the top-20 are function words (i.e. grammatical words),
 
 --
 
-This analysis is nearly useless: any other corpus of English would look pretty much identical!
+But that finding is nearly useless: any other corpus of English would look pretty much identical!
 
 ---
 class: middle
 
 .pull-left[
-This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called `stop_words`.]
+This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called stop_words.]
 
 .pull-right[
 
@@ -141,7 +142,9 @@ This is where it makes sense to remove **stop words** from the corpus: a predefi
 
 ### Removing stop words from a corpus
 
-Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join().
+Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join(). 
+
+&gt; Please read up on the *join* group of commands -  anti_join(), left_join(), etc. -  [here](https://dplyr.tidyverse.org/reference/mutate-joins.html) and [here](https://dplyr.tidyverse.org/reference/filter-joins.html).
 
 
 ```r
@@ -150,7 +153,12 @@ corpus_tokens &lt;-
   anti_join(stop_words)
 ```
 
-We've just lost a little more than half of our corpus size, but that's okay. Let's run the top-20 analysis again.
+---
+class:middle
+
+By dropping the stop words in our corpus, we've just lost a little more than half of our corpus size, but that's okay. At least we now know that the remaining words are actually interesting! 
+
+Let's run the top-20 analysis again.
 
 ---
 
@@ -183,7 +191,7 @@ top20
 .pull-left[
 Much better! This gives us an idea of what's going on in our corpus - at least of what some of the dominant topics are.
 
-But still not perfect. What else would we want to exclude? 
+But still not perfect. What else remains in the list that is not helpful? 
 ]
 
 .pull-right[
@@ -199,6 +207,216 @@ class: middle, center
 &lt;img src="top20_2_result.png" width="60%" /&gt;
 
 ---
+
+## Plan of action
+
+We should
+
+- write our own custom list of words to exclude in addition to the stop words (e.g. *it's*, which should have been dropped via stop word removal, but wasn't),
+- find a way to handle different inflected forms of the same word (e.g. *time/times*),
+- think about whether we want to conflate pairs of synonyms (e.g. *doctor* and *doc*).
+
+---
+
+## Write a custom "blacklist" of words 
+
+We'll write a simple vector of words we want to exclude. Since a vector is not a tibble (or data frame), we can't use anti_join() to remove those words from the corpus_tokens object. But we can use filter() to achieve the same thing.
+
+
+```r
+my_excl &lt;- 
+  c("it’s", "time")
+
+corpus_tokens &lt;- 
+  corpus_tokens %&gt;% 
+  filter(!word %in% my_excl)
+```
+
+---
+
+## Dealing with typographic punctuation
+
+The reason why we still had "it's" in the corpus (even after stop word removal) is because there were typographic apostrophes in there. And the stop_words list only knows straight apostrophes. 
+
+Let us replace one with the other, i.e. all typographic apostrophes will be replaced by straight ones: out with ’ and in with '. **We'll use another str_...() function for this.**
+
+
+```r
+corpus_tokens &lt;- 
+  corpus_tokens %&gt;% 
+  mutate(word = str_replace_all(word, "’", "'"))
+```
+
+---
+
+## Different forms of the same word
+
+*time/times*
+
+stemming vs. lemmatizing
+
+Either one of the procedures above would help here, but lemmatization is clearly better. We will discuss it in an upcoming class session when we talk about *annotation*.
+
+---
+class:middle
+
+## Synonyms
+
+If it is important to the analysis, then we may sometimes want to map several synonyms onto one term. Simply for practice, let's say we want to consolidate variation among different terms for the current pandemic: in our corpus we encounter *coronavirus, covid*, and *pandemic*, but we want them all to be replaced by one term - let's say *covid-19.*
+
+---
+class:middle
+
+Using the str_replace_all() function, here is how to search for several options and replace with just one string.
+
+
+```r
+corpus_tokens &lt;- 
+  corpus_tokens %&gt;% 
+  mutate(word = 
+           str_replace_all(word,
+                           "pandemic|covid|coronavirus",
+                           "covid-19"))
+```
+
+---
+class: middle
+
+When we finally re-run the top-20 analysis, here is what we get.
+
+---
+
+.pull-left[
+&lt;table class=" lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; rank &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; word &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; n &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; covid-19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; times &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; people &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; masks &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; mask &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; news &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; president &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bannon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; biden &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; black &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+&lt;table class=" lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; rank &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; word &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; n &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; school &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; putin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; u.s &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; child &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; children &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; percent &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ukraine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; costello &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; day &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; workers &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
