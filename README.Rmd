@@ -8,4 +8,4 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Find the slide presentation [here](index.html).
+Find the slide presentation [here](https://wordsmith189.github.io/04_keywords/).

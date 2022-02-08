@@ -116,23 +116,28 @@ top20
 ]
 
 ---
-class: middle
+class:middle
 
 ## Observation
 
 Practically all words in the top-20 are function words (i.e. grammatical words), with two exceptions: *said* and *have*.
+
 --
 
-This analysis is nearly useless - any other corpus of English would look pretty much identical!
+This analysis is nearly useless: any other corpus of English would look pretty much identical!
 
 ---
 class: middle
 
-This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called `stop_words`.
+.pull-left[
+This is where it makes sense to remove **stop words** from the corpus: a predefined list of high-frequency function words. {tidytext}  contains a tibble of stop words that we can use for this purpose. It is called `stop_words`.]
+
+.pull-right[
 
 ```{r echo=F}
 stop_words 
 ```
+]
 
 ---
 
@@ -194,4 +199,6 @@ xaringanExtra::use_scribble()
 ```
 
 <img src="top20_2_result.png" width="60%" />
+
+---
 
