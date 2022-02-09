@@ -242,7 +242,7 @@ corpus_tokens <-
 
 The reason why we still had "it's" in the corpus (even after stop word removal) is because there were typographic apostrophes in there. And the stop_words list only knows straight apostrophes. 
 
-Let us replace one with the other, i.e. all typographic apostrophes will be replaced by straight ones: out with ’ and in with '. **We'll use another str_...() function for this.**
+Let us replace one with the other, i.e. all typographic apostrophes will be replaced by straight ones: out with ’ and in with '. **We'll use another function from {stringr} for this: str_replace_all().**
 
 ```{r}
 corpus_tokens <- 
