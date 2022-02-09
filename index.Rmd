@@ -144,7 +144,7 @@ stop_words
 
 ---
 
-### Removing stop words from a corpus
+## Removing stop words from a corpus
 
 Because stop_words has a column with the same name as one of the columns in our corpus--the column **words** - we can easily remove all stop words using anti_join(). 
 
@@ -316,5 +316,46 @@ corpus_tokens %>%
 ```
 ]
 
+---
 
+class: middle, center, inverse
+
+# Word clouds
+
+---
+
+## Nobody loves word clouds
+
+.pull-left[
+Word clouds have an exceptionally bad reputation among NLP practitioners, digital text analysts, data scientists, computational linguists, etc. 
+]
+
+.pull-right[
+
+- "Word clouds are the pie chart of text data"
+- "Word clouds considered harmful"
+- "Word clouds are the mullets of the internet"
+
+.center[<img src="mullet.jpg" width="280px" />]
+
+]
+
+---
+
+## Let's make one anyway
+
+
+
+
+---
+
+class: middle, center, inverse
+
+# KWIC
+
+---
+
+## Keywords in context
+
+---
 
