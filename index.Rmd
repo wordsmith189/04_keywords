@@ -4,6 +4,8 @@ author:
   - "Lars Hinrichs<br />Digital Text Analysis"
 output:
   xaringan::moon_reader:
+    includes:
+      in_header: mygoogle.js
     css: xaringan-themer.css
     nature:
       slideNumberFormat: "%current%"
@@ -76,7 +78,8 @@ class:middle
 ## Get the top-20 most frequent words in your corpus
 
 ```{r include=FALSE}
-pacman::p_load(rio, tidyverse, tidytext, textreadr, flextable)
+library(pacman)
+p_load(rio, tidyverse, tidytext, textreadr, flextable)
 corpus <- read_dir("data") %>% 
   rename(doc_id = document, 
          text = content) %>% 
@@ -344,14 +347,48 @@ Here are some quotes from data-sciencey articles about word clouds:
 ]
 
 ---
+class: middle, center
+
+## I don't really have a counterargument, but...
+
+---
 
 ## Let's make one anyway
 
+We will need to p_load() two packages.
+
+```{r}
+p_load(wordcloud, wordcloud2)
+```
+
+Wordclouds are made from exactly the kind of frequency counts that we've produced above: one column of words and another column of frequencies. Only our top-20 would not be quite enough words to fill a "cloud". 
+
+---
+## Create data object to draw the cloud from
+
+.pull-left[
+We'll run code similar to the one above, counting word frequencies, but retain the top-80 instead of the top-20 terms.
+
+```{r}
+top80 <- 
+  corpus_tokens %>% 
+  count(word, sort = T) %>% 
+  slice(1:80)
+```
+]
+
+.pull-right[
+```{r echo=F}
+
+top80 %>% 
+  as_tibble() 
+
+```
+]
 
 
 
 ---
-
 class: middle, center, inverse
 
 # KWIC

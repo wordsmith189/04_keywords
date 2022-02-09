@@ -17,6 +17,13 @@
     <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
     <script src="index_files/kePrint/kePrint.js"></script>
     <link href="index_files/lightable/lightable.css" rel="stylesheet" />
+    <script>
+    window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-GV89SH3H9Y');
+      </script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -446,14 +453,61 @@ Here are some quotes from data-sciencey articles about word clouds:
 ]
 
 ---
+class: middle, center
+
+## I don't really have a counterargument, but...
+
+---
 
 ## Let's make one anyway
 
+We will need to p_load() two packages.
+
+
+```r
+p_load(wordcloud, wordcloud2)
+```
+
+Wordclouds are made from exactly the kind of frequency counts that we've produced above: one column of words and another column of frequencies. Only our top-20 would not be quite enough words to fill a "cloud". 
+
+---
+## Create data object to draw the cloud from
+
+.pull-left[
+We'll run code similar to the one above, counting word frequencies, but retain the top-80 instead of the top-20 terms.
+
+
+```r
+top80 &lt;- 
+  corpus_tokens %&gt;% 
+  count(word, sort = T) %&gt;% 
+  slice(1:80)
+```
+]
+
+.pull-right[
+
+```
+## # A tibble: 80 × 2
+##    word          n
+##    &lt;chr&gt;     &lt;int&gt;
+##  1 covid-19     53
+##  2 times        37
+##  3 people       35
+##  4 masks        33
+##  5 mask         32
+##  6 news         27
+##  7 president    27
+##  8 bannon       23
+##  9 biden        23
+## 10 black        22
+## # … with 70 more rows
+```
+]
 
 
 
 ---
-
 class: middle, center, inverse
 
 # KWIC
