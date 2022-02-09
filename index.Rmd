@@ -253,9 +253,9 @@ corpus_tokens <-
 
 ## Different forms of the same word
 
-*time/times*
+e.g. *time/times*
 
-stemming vs. lemmatizing
+possible remedies: stemming vs. lemmatizing
 
 Either one of the procedures above would help here, but lemmatization is clearly better. We will discuss it in an upcoming class session when we talk about *annotation*.
 
