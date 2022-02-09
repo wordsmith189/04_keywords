@@ -68,7 +68,8 @@ class: middle
 
 ## Word frequencies
 
-Basic assumption: more frequent words are more important and representative of a corpus's style/content/cognitive style
+Basic assumption: more frequent words are more "important"; more representative of a corpus's style/content/cognitive style
+
 ---
 class:middle
 
