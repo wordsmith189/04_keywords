@@ -355,10 +355,10 @@ class: middle, center
 
 ## Let's make one anyway
 
-We will need to p_load() two packages.
+We will need to p_load() three packages.
 
 ```{r}
-p_load(wordcloud, wordcloud2)
+p_load(wordcloud, wordcloud2, RColorBrewer)
 ```
 
 Wordclouds are made from exactly the kind of frequency counts that we've produced above: one column of words and another column of frequencies. Only our top-20 would not be quite enough words to fill a "cloud". 
@@ -386,6 +386,76 @@ top80 %>%
 ```
 ]
 
+---
+class: middle, center
+
+## Word cloud code
+
+---
+class: middle
+
+.pull-left[
+```{r eval=FALSE}
+set.seed(1234) # for reproducibility 
+
+wordcloud(words = top80$word, 
+          freq = top80$n, 
+          min.freq = 1,           
+          max.words=80, 
+          random.order=FALSE, 
+          rot.per=0.35,            
+          colors=brewer.pal(8, "Dark2"))
+
+```
+]
+
+.pull-right[
+```{r echo=FALSE}
+set.seed(1234) # for reproducibility 
+
+wordcloud(words = top80$word, 
+          freq = top80$n, 
+          min.freq = 1,           
+          max.words=80, 
+          random.order=FALSE, 
+          rot.per=0.35,            
+          colors=brewer.pal(8, "Dark2"))
+```
+
+]
+
+---
+class: middle, center
+
+## Alternative: bring in shapes<br />with {wordcloud2}
+
+---
+class: middle
+
+.pull-left[
+
+```{r eval=FALSE}
+wordcloud2(data = top80, 
+           size = 0.7, 
+           shape = 'heart')
+
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE}
+wordcloud2(data=top80, 
+           size = 0.7, 
+           shape = 'pentagon')
+
+```
+
+]
+
+.center[<br />Doesn't work &mdash; needs more than 80 terms!
+]
 
 
 ---
