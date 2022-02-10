@@ -641,18 +641,72 @@ class: middle, center
 ---
 class: middle
 
+.pull-left[
 
 ```r
 corpus     %&gt;% 
-  tokens() %&gt;% 
-  kwic(pattern = "child*", 
-       valuetype = "glob", 
-       window = 2)
+  tokens   %&gt;% 
+* kwic(pattern = "child*",
+       valuetype = "glob",  
+       window = 3)
 ```
+]
+
+--
+
+.pull-right[
+The search term uses a wildcard. So strings will be retrieved even if they are longer than the explicit search pattern 
+*child.*
+]
+
+---
+class: middle
+
+.pull-left[
+
+```r
+corpus     %&gt;% 
+  tokens   %&gt;% 
+  kwic(pattern = "child*",  
+*      valuetype = "glob",
+       window = 3)
+```
+]
+
+--
+
+.pull-right[
+The argument `valuetype` must clarify the kind of search pattern we have entered. Possible values: `glob, regex, fixed`.
+]
+
+---
+class: middle
+
+.pull-left[
+
+```r
+corpus     %&gt;% 
+  tokens   %&gt;% 
+  kwic(pattern = "child*",  
+       valuetype = "glob",  
+*      window = 3)
+```
+]
+
+--
+
+.pull-right[
+The argument `window` states how many words to the left and right of the target item we want to be returned.
+]
 
 ---
 background-image: url("kwic.png")
 background-size: contain
+
+---
+class: inverse, middle, center
+
+# The End
 
 ---
     </textarea>
