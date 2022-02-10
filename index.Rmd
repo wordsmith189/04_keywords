@@ -465,7 +465,75 @@ class: middle, center, inverse
 
 ---
 
-## Keywords in context
+## KWIC: Keywords in context
+
+A time-honored way of approaching text corpora with computers. <br /><br />
+
+--
+
+.center[
+<img src="kwic.png" width="50%" />
+]
+
+---
+## KWIC: Keywords in context
+
+Generations of undergraduates have searched corpora with this method using software like WordSmith or AntConc.
+
+.center[
+<img src="kwic.png" width="50%" />
+]
 
 ---
 
+## Let's do it with R!
+
+.pull-left[There is a very lovingly made R-package called {quanteda} that makes many of the established corpus methods available in R. So let's load it and do a KWIC search.
+]
+
+.pull-right[
+```{r}
+p_load(quanteda)
+```
+
+If you want to work with {quanteda}, your corpus has to be in the package's own "corpus" format. 
+
+The function to convert it is quanteda::corpus().
+
+]
+
+---
+class: middle
+
+```{r}
+corpus <- 
+  corpus %>% 
+  group_by(doc_id) %>% 
+  summarise(text = paste0(text, collapse = " ")) %>% 
+  corpus(docnames=id)
+
+corpus %>% 
+  class()
+```
+
+---
+class: middle, center
+
+## Running a KWIC
+
+---
+class: middle
+
+```{r eval=FALSE}
+corpus     %>% 
+  tokens() %>% 
+  kwic(pattern = "child*", 
+       valuetype = "glob", 
+       window = 2)
+```
+
+---
+background-image: url("kwic.png")
+background-size: contain
+
+---

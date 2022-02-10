@@ -576,10 +576,85 @@ class: middle, center, inverse
 
 ---
 
-## Keywords in context
+## KWIC: Keywords in context
+
+A time-honored way of approaching text corpora with computers. &lt;br /&gt;&lt;br /&gt;
+
+--
+
+.center[
+&lt;img src="kwic.png" width="50%" /&gt;
+]
+
+---
+## KWIC: Keywords in context
+
+Generations of undergraduates have searched corpora with this method using software like WordSmith or AntConc.
+
+.center[
+&lt;img src="kwic.png" width="50%" /&gt;
+]
 
 ---
 
+## Let's do it with R!
+
+.pull-left[There is a very lovingly made R-package called {quanteda} that makes many of the established corpus methods available in R. So let's load it and do a KWIC search.
+]
+
+.pull-right[
+
+```r
+p_load(quanteda)
+```
+
+If you want to work with {quanteda}, your corpus has to be in the package's own "corpus" format. 
+
+The function to convert it is quanteda::corpus().
+
+]
+
+---
+class: middle
+
+
+```r
+corpus &lt;- 
+  corpus %&gt;% 
+  group_by(doc_id) %&gt;% 
+  summarise(text = paste0(text, collapse = " ")) %&gt;% 
+  corpus(docnames=id)
+
+corpus %&gt;% 
+  class()
+```
+
+```
+## [1] "corpus"    "character"
+```
+
+---
+class: middle, center
+
+## Running a KWIC
+
+---
+class: middle
+
+
+```r
+corpus     %&gt;% 
+  tokens() %&gt;% 
+  kwic(pattern = "child*", 
+       valuetype = "glob", 
+       window = 2)
+```
+
+---
+background-image: url("kwic.png")
+background-size: contain
+
+---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
