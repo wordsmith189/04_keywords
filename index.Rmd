@@ -505,16 +505,31 @@ The function to convert it is quanteda::corpus().
 ---
 class: middle
 
+.pull-left[
 ```{r}
 corpus <- 
   corpus %>% 
-  group_by(doc_id) %>% 
-  summarise(text = paste0(text, collapse = " ")) %>% 
-  corpus(docnames=id)
+  group_by(doc_id) %>%  #<<
+  summarise(text =      #<<
+              paste0(text, #<<
+                     collapse = " ")) %>%  #<<
+  corpus(docnames = id)
 
 corpus %>% 
   class()
 ```
+]
+
+--
+
+.pull-right[
+
+Before we can convert to the {quanteda} corpus format, we have to change the shape of the corpus one more time: {quanteda} expects a data frame in which each document name occurs only once. 
+
+So we can't have one row per paragraph &mdash; we must have one row per document.
+
+]
+
 
 
 
