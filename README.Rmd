@@ -1,5 +1,5 @@
 ---
-title: "04 Word frequencies and keywords"
+title: "04 Word Frequency and Keywords"
 author: "Lars Hinrichs<br />Digital Text Analysis"
 output: github_document
 ---
@@ -8,4 +8,6 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Find the slide presentation [here](https://wordsmith189.github.io/04_keywords/).
+[<img src="slide1.png" width="400"/>](https://wordsmith189.github.io/04_keywords/)
+<br />Click to view the slide presentation.
+    
